@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Filing Citations</title>
+<style>
+  :root {
+    --paper: #f3eee2; --card: #fbf8f0; --ink: #1d1a16; --muted: #6b645a; --rule: #d6cdb9;
+    --accent: #8c2f1b; --accent-ink: #fff7ef; --ok: #2f6b3f; --warn: #9a6a12; --mark: #ffe08a;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #17140f; --card: #211d16; --ink: #efe8d8; --muted: #a39a88; --rule: #3a3326;
+      --accent: #e0805f; --accent-ink: #17140f; --ok: #7fc08f; --warn: #e0b45a; --mark: #6d5a1c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--serif); line-height: 1.5; }
+  header { padding: 28px 24px 8px; max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 1.9rem; margin: 0; letter-spacing: -0.01em; }
+  h1 span { color: var(--accent); }
+  .sub { color: var(--muted); margin: 4px 0 0; }
+  main { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px; max-width: 1400px;
+    margin: 0 auto; padding: 16px 24px 48px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  form { display: grid; gap: 10px; }
+  textarea { width: 100%; min-height: 84px; resize: vertical; padding: 12px 14px; font: inherit; font-size: 1.05rem;
+    background: var(--card); color: var(--ink); border: 1px solid var(--rule); border-radius: 4px; }
+  textarea:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  select { font: inherit; padding: 8px 10px; background: var(--card); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: 4px; max-width: 100%; }
+  button.primary { font: inherit; font-weight: 600; padding: 9px 20px; cursor: pointer; background: var(--accent);
+    color: var(--accent-ink); border: 0; border-radius: 4px; transition: transform .12s ease, opacity .12s; }
+  button.primary:hover { transform: translateY(-1px); }
+  button.primary:disabled { opacity: .55; cursor: wait; }
+  .examples { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 0; }
+  .examples button { font: inherit; font-size: .85rem; padding: 4px 10px; cursor: pointer; background: transparent;
+    color: var(--muted); border: 1px dashed var(--rule); border-radius: 999px; }
+  .examples button:hover { color: var(--accent); border-color: var(--accent); }
+  #answer { margin-top: 22px; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 16px 18px; }
+  .card.refusal { border-left: 5px solid var(--warn); }
+  .card.good { border-left: 5px solid var(--ok); }
+  .label { font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .answer-text { font-size: 1.15rem; margin: 6px 0 0; }
+  .meta { font-size: .82rem; color: var(--muted); margin-top: 8px; }
+  ol.cites { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 10px; }
+  ol.cites li { border-top: 1px solid var(--rule); padding-top: 10px; }
+  .cite-btn { all: unset; cursor: pointer; display: block; width: 100%; }
+  .cite-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .chip { display: inline-block; min-width: 1.6em; text-align: center; font-family: var(--mono); font-size: .8rem;
+    background: var(--accent); color: var(--accent-ink); border-radius: 3px; padding: 0 5px; margin-right: 6px; }
+  .src { font-weight: 600; }
+  .quote { font-family: var(--mono); font-size: .85rem; margin: 6px 0 0; padding: 8px 10px; background: var(--paper);
+    border-left: 3px solid var(--mark); white-space: pre-wrap; }
+  .cite-btn:hover .quote { border-left-color: var(--accent); }
+  .badge { font-size: .7rem; padding: 1px 6px; border-radius: 3px; border: 1px solid var(--rule); color: var(--muted);
+    margin-left: 6px; text-transform: uppercase; letter-spacing: .06em; }
+  .badge.amend { color: var(--accent); border-color: var(--accent); }
+  aside { position: sticky; top: 12px; align-self: start; }
+  @media (max-width: 900px) { aside { position: static; } }
+  .panel-head { display: flex; justify-content: space-between; gap: 8px; font-size: .85rem; color: var(--muted);
+    margin-bottom: 6px; }
+  iframe { width: 100%; height: 72vh; min-height: 420px; border: 1px solid var(--rule); border-radius: 4px; background: var(--card); }
+  .empty { color: var(--muted); border: 1px dashed var(--rule); border-radius: 4px; padding: 36px 20px; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Filing <span>Citations</span></h1>
+  <p class="sub">Ask a question about SEC filings. Every answer quotes the filing, section and page, or says it cannot answer.</p>
+</header>
+<main>
+  <section>
+    <form id="f">
+      <label class="label" for="q">Question</label>
+      <textarea id="q" required>How many employees did AMD report at the end of fiscal 2025?</textarea>
+      <div class="row">
+        <button class="primary" id="go" type="submit">Ask</button>
+        <label class="label" for="cfg">Retrieval</label>
+        <select id="cfg">
+          <option value="hybrid_rerank_version" selected>Hybrid + rerank + version filter</option>
+          <option value="hybrid_rerank">Hybrid + rerank</option>
+          <option value="hybrid">Hybrid</option>
+          <option value="dense">Dense only</option>
+          <option value="bm25">BM25 only</option>
+        </select>
+      </div>
+    </form>
+    <div class="examples" id="ex"></div>
+    <div id="answer" aria-live="polite"></div>
+  </section>
+  <aside>
+    <div class="panel-head"><span id="ph">Source page</span><a id="open" href="#" target="_blank" rel="noopener" hidden>Open in new tab</a></div>
+    <div class="empty" id="empty">Click a citation to read the source page with the quote highlighted.</div>
+    <iframe id="frame" title="Source page" hidden></iframe>
+  </aside>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const examples = [
+  "How many employees did AMD report at the end of fiscal 2025?",
+  "What date does Merck's current 10-K for fiscal 2023 give for its Annual Meeting of Shareholders?",
+  "What cash price per Delivery Hero share is Uber's takeover offer in the Business Combination Agreement?",
+  "What was Pfizer's total revenue in 2025?"
+];
+for (const e of examples) {
+  const b = document.createElement("button"); b.type = "button"; b.textContent = e;
+  b.onclick = () => { $("q").value = e; $("f").requestSubmit(); };
+  $("ex").appendChild(b);
+}
+function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+function openCite(c, n) {
+  const u = `/view?accession=${encodeURIComponent(c.accession)}&document=${encodeURIComponent(c.document)}&page=${c.page}&quote=${encodeURIComponent(c.quote)}`;
+  $("frame").src = u; $("frame").hidden = false; $("empty").hidden = true;
+  $("open").href = u; $("open").hidden = false;
+  $("ph").textContent = `[${n}] ${c.company} ${c.form}, ${c.section_title || c.section}, page ${c.page}`;
+}
+function render(a) {
+  const box = $("answer"); box.replaceChildren();
+  const card = el("div", "card " + (a.answerable ? "good" : "refusal"));
+  card.appendChild(el("div", "label", a.answerable ? "Answer" : "No supported answer"));
+  card.appendChild(el("p", "answer-text", a.answer));
+  if (!a.answerable && a.refusal_reason) card.appendChild(el("div", "meta", "Reason: " + a.refusal_reason));
+  const ol = el("ol", "cites");
+  a.citations.forEach((c, i) => {
+    const li = el("li"); const b = el("button", "cite-btn"); b.type = "button";
+    const head = el("div"); head.appendChild(el("span", "chip", String(i + 1)));
+    head.appendChild(el("span", "src", `${c.company} ${c.form}`));
+    head.appendChild(document.createTextNode(` filed ${c.filed}, ${c.section_title || c.section}, page ${c.page}`));
+    head.appendChild(el("span", "badge" + (c.version === "amendment" ? " amend" : ""), c.version));
+    b.appendChild(head); b.appendChild(el("div", "quote", c.quote));
+    b.onclick = () => openCite(c, i + 1); li.appendChild(b); ol.appendChild(li);
+  });
+  card.appendChild(ol);
+  card.appendChild(el("div", "meta", `${a.model}, ${a.latency_s.toFixed(1)} s`));
+  box.appendChild(card);
+  if (a.citations.length) openCite(a.citations[0], 1);
+}
+$("f").onsubmit = async (ev) => {
+  ev.preventDefault(); $("go").disabled = true; $("go").textContent = "Working";
+  try {
+    const r = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: $("q").value, config: $("cfg").value }) });
+    if (!r.ok) throw new Error(await r.text());
+    render(await r.json());
+  } catch (e) { $("answer").replaceChildren(el("div", "card refusal", "Request failed: " + e.message)); }
+  $("go").disabled = false; $("go").textContent = "Ask";
+};
+</script>
+</body>
+</html>

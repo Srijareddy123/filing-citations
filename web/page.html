@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source page</title>
+<style>
+  :root { --paper: #fbf8f0; --ink: #1d1a16; --muted: #6b645a; --rule: #d6cdb9; --mark: #ffe08a; --accent: #8c2f1b; }
+  @media (prefers-color-scheme: dark) { :root { --paper: #211d16; --ink: #efe8d8; --muted: #a39a88; --rule: #3a3326; --mark: #6d5a1c; --accent: #e0805f; } }
+  body { margin: 0; padding: 18px 22px 40px; background: var(--paper); color: var(--ink);
+    font-family: "Iowan Old Style", Palatino, Georgia, serif; line-height: 1.6; }
+  .head { font-size: .85rem; color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: 8px; margin-bottom: 12px; }
+  .head a { color: var(--accent); }
+  h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 18px 0 4px; }
+  p { margin: 0 0 10px; font-size: .95rem; }
+  mark { background: var(--mark); color: inherit; padding: 1px 2px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="head">{{HEAD}}. <a href="{{SRC}}" target="_blank" rel="noopener">Open the filing on sec.gov</a></div>
+{{BODY}}
+<script>const m = document.getElementById("quote"); if (m) m.scrollIntoView({ block: "center" });</script>
+</body>
+</html>
