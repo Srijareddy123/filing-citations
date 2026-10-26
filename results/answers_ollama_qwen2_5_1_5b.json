@@ -1,0 +1,57 @@
+{
+  "bm25": {
+    "answer_correctness": 0.333,
+    "citation_precision": 0.507,
+    "quote_verbatim_rate": 1.0,
+    "refusal_accuracy_unanswerable": 0.438,
+    "false_refusal_rate_answerable": 0.302,
+    "p50_s": 6.02,
+    "p95_s": 8.92,
+    "n": 128,
+    "model": "ollama:qwen2.5:1.5b"
+  },
+  "dense": {
+    "answer_correctness": 0.323,
+    "citation_precision": 0.541,
+    "quote_verbatim_rate": 1.0,
+    "refusal_accuracy_unanswerable": 0.625,
+    "false_refusal_rate_answerable": 0.385,
+    "p50_s": 6.66,
+    "p95_s": 10.81,
+    "n": 128,
+    "model": "ollama:qwen2.5:1.5b"
+  },
+  "hybrid": {
+    "answer_correctness": 0.375,
+    "citation_precision": 0.534,
+    "quote_verbatim_rate": 1.0,
+    "refusal_accuracy_unanswerable": 0.656,
+    "false_refusal_rate_answerable": 0.271,
+    "p50_s": 6.7,
+    "p95_s": 10.47,
+    "n": 128,
+    "model": "ollama:qwen2.5:1.5b"
+  },
+  "hybrid_rerank": {
+    "answer_correctness": 0.354,
+    "citation_precision": 0.609,
+    "quote_verbatim_rate": 1.0,
+    "refusal_accuracy_unanswerable": 0.594,
+    "false_refusal_rate_answerable": 0.344,
+    "p50_s": 6.95,
+    "p95_s": 11.04,
+    "n": 128,
+    "model": "ollama:qwen2.5:1.5b"
+  },
+  "hybrid_rerank_version": {
+    "answer_correctness": 0.344,
+    "citation_precision": 0.627,
+    "quote_verbatim_rate": 1.0,
+    "refusal_accuracy_unanswerable": 0.625,
+    "false_refusal_rate_answerable": 0.323,
+    "p50_s": 6.93,
+    "p95_s": 11.44,
+    "n": 128,
+    "model": "ollama:qwen2.5:1.5b"
+  }
+}

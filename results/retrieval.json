@@ -1,0 +1,82 @@
+{
+  "bm25": {
+    "evidence_recall_at_8": 0.661,
+    "all_evidence_found_at_8": 0.646,
+    "mrr": 0.527,
+    "stale_hit_share_version_traps": 0.167,
+    "retrieval_p50_ms": 10,
+    "retrieval_p95_ms": 20,
+    "n_answerable": 96,
+    "recall_by_type": {
+      "comparison": 0.438,
+      "version_trap": 0.667,
+      "single_fact": 0.88,
+      "numeric": 0.727,
+      "multi_hop": 0.433
+    }
+  },
+  "dense": {
+    "evidence_recall_at_8": 0.615,
+    "all_evidence_found_at_8": 0.594,
+    "mrr": 0.448,
+    "stale_hit_share_version_traps": 0.215,
+    "retrieval_p50_ms": 36,
+    "retrieval_p95_ms": 56,
+    "n_answerable": 96,
+    "recall_by_type": {
+      "comparison": 0.438,
+      "version_trap": 0.667,
+      "single_fact": 0.84,
+      "numeric": 0.636,
+      "multi_hop": 0.333
+    }
+  },
+  "hybrid": {
+    "evidence_recall_at_8": 0.719,
+    "all_evidence_found_at_8": 0.677,
+    "mrr": 0.514,
+    "stale_hit_share_version_traps": 0.201,
+    "retrieval_p50_ms": 44,
+    "retrieval_p95_ms": 53,
+    "n_answerable": 96,
+    "recall_by_type": {
+      "comparison": 0.531,
+      "version_trap": 0.778,
+      "single_fact": 0.96,
+      "numeric": 0.682,
+      "multi_hop": 0.5
+    }
+  },
+  "hybrid_rerank": {
+    "evidence_recall_at_8": 0.651,
+    "all_evidence_found_at_8": 0.594,
+    "mrr": 0.534,
+    "stale_hit_share_version_traps": 0.153,
+    "retrieval_p50_ms": 297,
+    "retrieval_p95_ms": 375,
+    "n_answerable": 96,
+    "recall_by_type": {
+      "comparison": 0.375,
+      "version_trap": 0.667,
+      "single_fact": 0.92,
+      "numeric": 0.591,
+      "multi_hop": 0.567
+    }
+  },
+  "hybrid_rerank_version": {
+    "evidence_recall_at_8": 0.646,
+    "all_evidence_found_at_8": 0.594,
+    "mrr": 0.526,
+    "stale_hit_share_version_traps": 0.097,
+    "retrieval_p50_ms": 307,
+    "retrieval_p95_ms": 370,
+    "n_answerable": 96,
+    "recall_by_type": {
+      "comparison": 0.406,
+      "version_trap": 0.611,
+      "single_fact": 0.92,
+      "numeric": 0.591,
+      "multi_hop": 0.567
+    }
+  }
+}
