@@ -8,59 +8,39 @@ Topics: rag, sec-edgar, opensearch, langgraph, hybrid-search, reranking, citatio
 
 ## Results
 
-Golden set: 128 questions written from the filings, each with a verbatim evidence quote (32 are unanswerable). Commands: `make eval-retrieval` and `make eval`, tables filled by `make report`. Latency includes the model call.
+Golden set of 128 questions (32 unanswerable), 5 configurations, scoped by company and form. Answer metrics come from a local 1.5B model (`ollama:qwen2.5:1.5b`); no Claude or Bedrock numbers exist. Retrieval-only table and caveats: [docs/RESULTS.md](docs/RESULTS.md).
 
 <!-- results:start -->
 
-**Retrieval only (no model)**
-
-| Configuration | Evidence recall@8 | All evidence found@8 | MRR | Stale hits (version traps) | Retrieval p50 / p95 |
-|---|---|---|---|---|---|
-| BM25 only | 0.66 | 0.65 | 0.53 | 17% | 10 / 20 ms |
-| Dense only | 0.61 | 0.59 | 0.45 | 22% | 36 / 56 ms |
-| Hybrid (RRF) | 0.72 | 0.68 | 0.51 | 20% | 44 / 53 ms |
-| Hybrid + rerank | 0.65 | 0.59 | 0.53 | 15% | 297 / 375 ms |
-| Hybrid + rerank + version filter | 0.65 | 0.59 | 0.53 | 10% | 307 / 370 ms |
-
-**Answers**
-
-Model: `ollama:qwen2.5:1.5b`
-
-| Configuration | Answer correctness | Citation precision | Quote verbatim | Refusal accuracy (unanswerable) | False refusals | p50 / p95 |
-|---|---|---|---|---|---|---|
-| BM25 only | 0.33 | 0.51 | 1.00 | 0.44 | 0.30 | 6.0 / 8.9 s |
-| Dense only | 0.32 | 0.54 | 1.00 | 0.62 | 0.39 | 6.7 / 10.8 s |
-| Hybrid (RRF) | 0.38 | 0.53 | 1.00 | 0.66 | 0.27 | 6.7 / 10.5 s |
-| Hybrid + rerank | 0.35 | 0.61 | 1.00 | 0.59 | 0.34 | 7.0 / 11.0 s |
-| Hybrid + rerank + version filter | 0.34 | 0.63 | 1.00 | 0.62 | 0.32 | 6.9 / 11.4 s |
+| Configuration | Answer correctness | Citation precision | Refusal accuracy | p50 / p95 |
+|---|---|---|---|---|
+| BM25 only | 0.33 | 0.51 | 0.44 | 6.0 / 8.9 s |
+| Dense only | 0.32 | 0.54 | 0.62 | 6.7 / 10.8 s |
+| Hybrid (RRF) | 0.38 | 0.53 | 0.66 | 6.7 / 10.5 s |
+| Hybrid + rerank | 0.35 | 0.61 | 0.59 | 7.0 / 11.0 s |
+| Hybrid + rerank + version filter | 0.34 | 0.63 | 0.62 | 6.9 / 11.4 s |
 
 <!-- results:end -->
-
-Answer metrics use only the local model named above. No Claude or Bedrock key was available, so those columns are not reported for them. Retrieval metrics need no model.
 
 ## How it works
 
 ```mermaid
 flowchart LR
-  E[EDGAR fetch] --> P[Parse pages and sections]
-  P --> C[Chunks + version flag]
-  C --> O[(OpenSearch: BM25 + vectors)]
-  Q[Question] --> S[Scope: company, form]
-  S --> O
-  O --> F[RRF fusion] --> R[Cross-encoder rerank]
-  R --> A[LangGraph agent: answer, verify quotes, refuse]
-  A --> U[Web UI / API / MCP server]
+  A[EDGAR fetch + parse] --> B[Chunks + version flag] --> C[(OpenSearch: BM25 + vectors)] --> D[RRF + rerank] --> E[Agent: answer, verify quotes, refuse]
 ```
 
-Filings are split on their own page breaks and Item headings into chunks with company, form, period, filed date and version. A section counts as superseded when a later amendment of the same period has it. Search fuses BM25 and vectors with RRF, then a cross-encoder reranks the top 30. The agent has the model answer with quotes, checks each quote against the cited page, drops any that are not verbatim, and refuses when none survive.
+- Filings are split on their own page breaks and Item headings.
+- Each chunk carries company, form, period, filed date and version.
+- A section is superseded when a later amendment of the same period has it.
+- Search fuses BM25 and vectors with RRF, then a cross-encoder reranks the top 30.
+- The agent checks each quote against the cited page, drops any that are not verbatim, and refuses when none survive.
 
 ## Design choices
 
-- **Versions per section.** A Part III only 10-K/A does not replace the financials, so "current" is decided per section. A filing-level flag was tried and dropped.
-- **Quotes are checked in code.** A small model paraphrases, so near-verbatim quotes snap to the real sentence and everything else is dropped.
-- **Company and form scope in every config.** The table then isolates retrieval and the version filter, which only the last row adds.
+- **Versions per section.** A Part III only 10-K/A does not replace the financials, so "current" is decided per section.
+- **Quotes are checked in code.** A small model paraphrases, so only verbatim quotes survive.
 - **RRF, not score blending.** BM25 and cosine scores are not comparable and rank fusion needed no tuning.
-- **The reranker lowered recall here.** The MS MARCO cross-encoder cut evidence recall@8 against plain hybrid. The table keeps that result.
+- **The reranker did not help recall.** The MS MARCO cross-encoder cut evidence recall@8 against plain hybrid.
 
 ## Run it
 

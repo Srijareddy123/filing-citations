@@ -1,4 +1,4 @@
-"""Turn results/*.json into markdown tables and paste them into the README between markers."""
+"""Turn results/*.json into markdown tables: a compact one for the README, the full set for docs/RESULTS.md."""
 
 from __future__ import annotations
 
@@ -40,6 +40,33 @@ def answer_table(data: dict) -> str:
     return head + "\n".join(rows)
 
 
+def compact_table(data: dict) -> str:
+    head = (
+        "| Configuration | Answer correctness | Citation precision | Refusal accuracy | p50 / p95 |\n"
+        "|---|---|---|---|---|\n"
+    )
+    rows = [
+        f"| {LABELS[k]} | {v['answer_correctness']:.2f} | {v['citation_precision']:.2f} | "
+        f"{v['refusal_accuracy_unanswerable']:.2f} | {v['p50_s']:.1f} / {v['p95_s']:.1f} s |"
+        for k, v in data.items()
+    ]
+    return head + "\n".join(rows)
+
+
+def build_compact(results: Path = config.RESULTS_DIR) -> str:
+    files = sorted(results.glob("answers_*.json"))
+    return "\n\n".join(compact_table(json.loads(f.read_text())) for f in files)
+
+
+def replace_block(path: Path, text: str) -> None:
+    if not path.exists() or START not in path.read_text():
+        return
+    new = re.sub(
+        f"{re.escape(START)}.*?{re.escape(END)}", lambda _: f"{START}\n\n{text}\n\n{END}", path.read_text(), flags=re.S
+    )
+    path.write_text(new)
+
+
 def build(results: Path = config.RESULTS_DIR) -> str:
     parts = []
     if (results / "retrieval.json").exists():
@@ -54,11 +81,8 @@ def build(results: Path = config.RESULTS_DIR) -> str:
 def main() -> None:
     text = build()
     (config.RESULTS_DIR / "results.md").write_text(text + "\n")
-    readme = config.ROOT / "README.md"
-    if readme.exists() and START in readme.read_text():
-        body = readme.read_text()
-        new = re.sub(f"{re.escape(START)}.*?{re.escape(END)}", f"{START}\n\n{text}\n\n{END}", body, flags=re.S)
-        readme.write_text(new)
+    replace_block(config.ROOT / "README.md", build_compact())
+    replace_block(config.ROOT / "docs" / "RESULTS.md", text)
     print(text)
 
 
