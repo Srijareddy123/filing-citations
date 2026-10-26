@@ -71,7 +71,7 @@ make ui                    # web page on http://127.0.0.1:8100 (after make demo)
 make demo-lite             # no Docker, no model: in-memory search and an offline stub
 ```
 
-`make demo` uses a local Ollama model if one is running (`brew install ollama; ollama pull qwen2.5:1.5b`) and the offline stub otherwise. No API keys needed. Keys switch on the full path: set `FC_LLM=anthropic` with `ANTHROPIC_API_KEY`, or `FC_LLM=bedrock` with AWS credentials.
+`make demo` uses a local Ollama model if one is running (`brew install ollama; ollama pull qwen2.5:1.5b`) and the offline stub otherwise. The stub does not answer: it returns the best-matching sentence from the top result, so its output is often an unrelated quote. The UI screenshot above was taken with Ollama qwen2.5:1.5b, not the default demo. No API keys needed. Keys switch on the full path: set `FC_LLM=anthropic` with `ANTHROPIC_API_KEY`, or `FC_LLM=bedrock` with AWS credentials.
 
 Full corpus: copy `.env.example` to `.env`, set `SEC_USER_AGENT` to your name and email (SEC fair access, the fetcher stays under 8 requests per second), then `make fetch parse index` and `make eval`. `make down` stops OpenSearch and removes its volume.
 
@@ -79,7 +79,7 @@ MCP server for other AI apps: `python -m filingcite.mcp_server` exposes `search_
 
 ## Tests
 
-`make test` runs 40 pytest tests on the committed sample (parser, version flags, retrieval, agent refusal, API, MCP, and a check that every golden evidence quote is verbatim in the indexed page). `make lint` runs ruff. CI runs both on Python 3.12 and 3.13 with an OpenSearch service.
+`make test` runs 40 pytest tests (parser, version flags, retrieval, agent refusal, API, MCP, and a check that every golden evidence quote is verbatim in the committed sample page). On a cold clone 39 run and 1 is skipped, the check against the full parsed corpus, which needs `make fetch parse index`. Without OpenSearch running, the OpenSearch test is skipped too (38 run, 2 skipped). `make lint` runs ruff. CI runs both on Python 3.12 and 3.13 with an OpenSearch service.
 
 ## What I'd do next
 
