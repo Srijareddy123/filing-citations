@@ -59,7 +59,7 @@ class FilingAgent:
         corpus: Corpus,
         llm: LLM,
         config_name: str = "hybrid_rerank_version",
-        top_k: int = 6,
+        top_k: int = 8,
         min_score: float | None = None,
     ) -> None:
         self.retriever, self.corpus, self.llm = retriever, corpus, llm

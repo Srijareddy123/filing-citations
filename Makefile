@@ -36,7 +36,7 @@ lint:
 eval-retrieval:
 	$(PY) -m filingcite.evaluate retrieval
 eval: eval-retrieval
-	$(PY) -m filingcite.evaluate answers --provider ollama
+	$(PY) -m filingcite.evaluate answers --provider ollama --no-cache
 report:
 	$(PY) -m filingcite.report
 

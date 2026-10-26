@@ -26,19 +26,20 @@ class OllamaLLM:
         self.name = f"ollama:{self.model}"
 
     def complete(self, system: str, user: str) -> str:
-        r = httpx.post(
-            f"{self.url}/api/chat",
-            timeout=300,
-            json={
+        """JSON mode first. Ollama sometimes answers 500 when the small model breaks JSON, so retry without it."""
+        for use_format in (True, False):
+            body = {
                 "model": self.model,
                 "stream": False,
-                "format": "json",
                 "options": {"temperature": 0, "num_ctx": 6144, "num_predict": 400},
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-            },
-        )
-        r.raise_for_status()
-        return r.json()["message"]["content"]
+            }
+            if use_format:
+                body["format"] = "json"
+            r = httpx.post(f"{self.url}/api/chat", timeout=300, json=body)
+            if r.status_code == 200:
+                return r.json()["message"]["content"]
+        raise RuntimeError(f"Ollama failed twice: {r.status_code} {r.text[:200]}")
 
 
 class AnthropicLLM:

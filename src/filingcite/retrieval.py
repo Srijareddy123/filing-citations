@@ -21,6 +21,7 @@ CONFIGS: dict[str, dict] = {
     "hybrid_rerank": {"mode": "hybrid", "rerank": True, "current": False},
     "hybrid_rerank_version": {"mode": "hybrid", "rerank": True, "current": True},
 }
+COMMON_FIRST_WORDS = {"home", "walt", "advanced", "general", "united", "american", "coca", "first", "new"}
 _ORIGINAL = re.compile(
     r"\b(original(ly)?|as (first )?filed|before the amendment|prior to the amendment|"
     r"superseded)\b",
@@ -42,7 +43,9 @@ def build_aliases(metas: dict[str, FilingMeta]) -> dict[str, str]:
         name = " ".join(name.split())
         if name:
             out[name] = m.ticker
-            out[name.split()[0]] = m.ticker
+            first = name.split()[0]
+            if len(first) >= 4 and first not in COMMON_FIRST_WORDS:
+                out[first] = m.ticker
     out.update(
         {
             "alphabet": "GOOGL",

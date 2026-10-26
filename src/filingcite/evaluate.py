@@ -194,7 +194,11 @@ def cmd_answers(args) -> None:
     retriever = default_retriever()
     RESULTS.mkdir(exist_ok=True)
     inner = get_llm(args.provider)
-    llm = CachedLLM(inner, RESULTS / f"llm_cache_{re.sub(r'[^a-z0-9]+', '_', inner.name)}.jsonl")
+    llm = (
+        inner
+        if args.no_cache
+        else CachedLLM(inner, RESULTS / f"llm_cache_{re.sub(r'[^a-z0-9]+', '_', inner.name)}.jsonl")
+    )
     out = {}
     for cfg in args.configs or CONFIGS:
         agent = FilingAgent(retriever, corpus, llm, config_name=cfg)
@@ -212,6 +216,7 @@ def main() -> None:
     a = sub.add_parser("answers")
     a.add_argument("--provider", default=None)
     a.add_argument("--limit", type=int, default=0)
+    a.add_argument("--no-cache", action="store_true", help="call the model every time so latency is real")
     a.add_argument("--configs", nargs="*")
     args = ap.parse_args()
     {"retrieval": cmd_retrieval, "answers": cmd_answers}[args.cmd](args)

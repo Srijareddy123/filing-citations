@@ -149,6 +149,8 @@ $("f").onsubmit = async (ev) => {
   } catch (e) { $("answer").replaceChildren(el("div", "card refusal", "Request failed: " + e.message)); }
   $("go").disabled = false; $("go").textContent = "Ask";
 };
+const qp = new URLSearchParams(location.search).get("q");
+if (qp) { $("q").value = qp; $("f").requestSubmit(); }
 </script>
 </body>
 </html>

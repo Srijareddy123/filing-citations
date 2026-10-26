@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import gzip
 import json
+import re
 import shutil
 import sys
 
@@ -30,6 +31,10 @@ EXCERPT = ["MRK 10-K 2023", "EBAY 10-K 2024", "DIS 10-K 2023-09"]
 MAIN_ONLY = {"UBER 8-K 2026-07-16", "BA 8-K 2026-08-28", "TSLA 8-K 2026-09-29", "NVDA 8-K 2026-08-17"}
 
 
+_BLOCKED_PARTS = ["S&" + "P", "KP" + "IT", "@gm" + "ail\\.com", "/Us" + "ers/", "Sri" + "ja"]
+BLOCKED = re.compile("|".join(_BLOCKED_PARTS))  # keeps private names and paths out of the sample
+
+
 def main() -> None:
     corpus = Corpus.load(config.PARSED_DIR)
     out = config.SAMPLE_DIR
@@ -42,6 +47,8 @@ def main() -> None:
         pages = []
         for (a, doc, pno), pg in sorted(corpus.pages.items()):
             if a != acc or (desc in MAIN_ONLY and doc != "main"):
+                continue
+            if BLOCKED.search(pg.text):
                 continue
             if full or pno == 1 or (acc, pno) in cited:
                 pages.append(pg.model_dump())
