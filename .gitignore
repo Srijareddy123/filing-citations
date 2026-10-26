@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+data/raw/
+data/parsed/
+data/embeddings/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+mlruns/
+shots/

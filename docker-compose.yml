@@ -1,0 +1,22 @@
+services:
+  opensearch:
+    image: opensearchproject/opensearch:2.17.1
+    container_name: filing-citations-opensearch
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - bootstrap.memory_lock=false
+    ports:
+      - "127.0.0.1:9201:9200"
+    volumes:
+      - osdata:/usr/share/opensearch/data
+    mem_limit: 1536m
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -qE 'green|yellow'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+volumes:
+  osdata:
